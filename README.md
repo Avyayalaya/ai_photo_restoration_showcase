@@ -23,14 +23,6 @@ This is an interactive showcase of AI-powered photo restoration using FLUX Konte
 2. Enable GitHub Pages in repository settings
 3. Your showcase will be live at: `https://yourusername.github.io/repository-name`
 
-### Netlify
-1. Drag and drop the entire folder to [netlify.com/drop](https://netlify.com/drop)
-2. Get an instant live URL
-
-### Vercel
-1. Upload to [vercel.com](https://vercel.com)
-2. Connect your GitHub repository for automatic deployments
-
 ## Generated Files
 
 - `index.html` - Main showcase page
