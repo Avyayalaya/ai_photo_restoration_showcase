@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Photo Restoration Showcase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .stats {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .stats h2 {
+            margin-bottom: 10px;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .comparison-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .comparison-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .image-comparison {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .image-container {
+            flex: 1;
+            text-align: center;
+        }
+
+        .image-label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .original-label {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .restored-label {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .image-container img:hover {
+            transform: scale(1.02);
+        }
+
+        .slider-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .slider-image {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slider-image.restored {
+            clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%);
+            transition: clip-path 0.3s ease;
+        }
+
+        .slider-divider {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 3px;
+            height: 100%;
+            background: white;
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            transition: left 0.3s ease;
+        }
+
+        .slider-label {
+            position: absolute;
+            top: 10px;
+            padding: 5px 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .slider-label.original {
+            left: 10px;
+        }
+
+        .slider-label.restored {
+            right: 10px;
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .view-toggle {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .view-toggle:hover {
+            background: #5a6fd8;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .image-comparison {
+                flex-direction: column;
+            }
+            
+            .image-container img {
+                height: 250px;
+            }
+            
+            .slider-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 AI Photo Restoration Showcase</h1>
+            <p>Watch old memories come back to life with AI-powered restoration</p>
+        </div>
+
+        <div class="stats">
+            <h2>📊 Restoration Results</h2>
+            <p><strong>21</strong> photos successfully restored using FLUX Kontext AI</p>
+        </div>
+
+        <div class="gallery">
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0000</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide0">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0000_input.jpg" alt="Original IMG-20210913-WA0000">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0000_restored.jpg" alt="Restored IMG-20210913-WA0000">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider0" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0000_input.jpg" alt="Original IMG-20210913-WA0000">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0000_restored.jpg" alt="Restored IMG-20210913-WA0000">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(0)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0001</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide1">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0001_input.jpg" alt="Original IMG-20210913-WA0001">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0001_restored.jpg" alt="Restored IMG-20210913-WA0001">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider1" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0001_input.jpg" alt="Original IMG-20210913-WA0001">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0001_restored.jpg" alt="Restored IMG-20210913-WA0001">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(1)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0005</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide2">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0005_input.jpg" alt="Original IMG-20210913-WA0005">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0005_restored.jpg" alt="Restored IMG-20210913-WA0005">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider2" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0005_input.jpg" alt="Original IMG-20210913-WA0005">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0005_restored.jpg" alt="Restored IMG-20210913-WA0005">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(2)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0007</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide3">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0007_input.jpg" alt="Original IMG-20210913-WA0007">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0007_restored.jpg" alt="Restored IMG-20210913-WA0007">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider3" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0007_input.jpg" alt="Original IMG-20210913-WA0007">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0007_restored.jpg" alt="Restored IMG-20210913-WA0007">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(3)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0008</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide4">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0008_input.jpg" alt="Original IMG-20210913-WA0008">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0008_restored.jpg" alt="Restored IMG-20210913-WA0008">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider4" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0008_input.jpg" alt="Original IMG-20210913-WA0008">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0008_restored.jpg" alt="Restored IMG-20210913-WA0008">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(4)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0009</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide5">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0009_input.jpg" alt="Original IMG-20210913-WA0009">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0009_restored.jpg" alt="Restored IMG-20210913-WA0009">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider5" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0009_input.jpg" alt="Original IMG-20210913-WA0009">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0009_restored.jpg" alt="Restored IMG-20210913-WA0009">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(5)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0010</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide6">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0010_input.jpg" alt="Original IMG-20210913-WA0010">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0010_restored.jpg" alt="Restored IMG-20210913-WA0010">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider6" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0010_input.jpg" alt="Original IMG-20210913-WA0010">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0010_restored.jpg" alt="Restored IMG-20210913-WA0010">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(6)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0015</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide7">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0015_input.jpg" alt="Original IMG-20210913-WA0015">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0015_restored.jpg" alt="Restored IMG-20210913-WA0015">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider7" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0015_input.jpg" alt="Original IMG-20210913-WA0015">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0015_restored.jpg" alt="Restored IMG-20210913-WA0015">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(7)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0016</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide8">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0016_input.jpg" alt="Original IMG-20210913-WA0016">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0016_restored.jpg" alt="Restored IMG-20210913-WA0016">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider8" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0016_input.jpg" alt="Original IMG-20210913-WA0016">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0016_restored.jpg" alt="Restored IMG-20210913-WA0016">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(8)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0018</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide9">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0018_input.jpg" alt="Original IMG-20210913-WA0018">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0018_restored.jpg" alt="Restored IMG-20210913-WA0018">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider9" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0018_input.jpg" alt="Original IMG-20210913-WA0018">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0018_restored.jpg" alt="Restored IMG-20210913-WA0018">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(9)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0019</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide10">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0019_input.jpg" alt="Original IMG-20210913-WA0019">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0019_restored.jpg" alt="Restored IMG-20210913-WA0019">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider10" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0019_input.jpg" alt="Original IMG-20210913-WA0019">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0019_restored.jpg" alt="Restored IMG-20210913-WA0019">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(10)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0021</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide11">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0021_input.jpg" alt="Original IMG-20210913-WA0021">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0021_restored.jpg" alt="Restored IMG-20210913-WA0021">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider11" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0021_input.jpg" alt="Original IMG-20210913-WA0021">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0021_restored.jpg" alt="Restored IMG-20210913-WA0021">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(11)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0023</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide12">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0023_input.jpg" alt="Original IMG-20210913-WA0023">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0023_restored.jpg" alt="Restored IMG-20210913-WA0023">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider12" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0023_input.jpg" alt="Original IMG-20210913-WA0023">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0023_restored.jpg" alt="Restored IMG-20210913-WA0023">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(12)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0024</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide13">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0024_input.jpg" alt="Original IMG-20210913-WA0024">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0024_restored.jpg" alt="Restored IMG-20210913-WA0024">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider13" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0024_input.jpg" alt="Original IMG-20210913-WA0024">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0024_restored.jpg" alt="Restored IMG-20210913-WA0024">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(13)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0028</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide14">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0028_input.jpg" alt="Original IMG-20210913-WA0028">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0028_restored.jpg" alt="Restored IMG-20210913-WA0028">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider14" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0028_input.jpg" alt="Original IMG-20210913-WA0028">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0028_restored.jpg" alt="Restored IMG-20210913-WA0028">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(14)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0036</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide15">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0036_input.jpg" alt="Original IMG-20210913-WA0036">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0036_restored.jpg" alt="Restored IMG-20210913-WA0036">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider15" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0036_input.jpg" alt="Original IMG-20210913-WA0036">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0036_restored.jpg" alt="Restored IMG-20210913-WA0036">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(15)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0037</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide16">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0037_input.jpg" alt="Original IMG-20210913-WA0037">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0037_restored.jpg" alt="Restored IMG-20210913-WA0037">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider16" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0037_input.jpg" alt="Original IMG-20210913-WA0037">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0037_restored.jpg" alt="Restored IMG-20210913-WA0037">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(16)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0038</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide17">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0038_input.jpg" alt="Original IMG-20210913-WA0038">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0038_restored.jpg" alt="Restored IMG-20210913-WA0038">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider17" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0038_input.jpg" alt="Original IMG-20210913-WA0038">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0038_restored.jpg" alt="Restored IMG-20210913-WA0038">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(17)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0039</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide18">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0039_input.jpg" alt="Original IMG-20210913-WA0039">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0039_restored.jpg" alt="Restored IMG-20210913-WA0039">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider18" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0039_input.jpg" alt="Original IMG-20210913-WA0039">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0039_restored.jpg" alt="Restored IMG-20210913-WA0039">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(18)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0040</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide19">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0040_input.jpg" alt="Original IMG-20210913-WA0040">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0040_restored.jpg" alt="Restored IMG-20210913-WA0040">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider19" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0040_input.jpg" alt="Original IMG-20210913-WA0040">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0040_restored.jpg" alt="Restored IMG-20210913-WA0040">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(19)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+                <div class="comparison-card">
+                    <div class="card-title">IMG-20210913-WA0041</div>
+                    
+                    <!-- Side by Side View -->
+                    <div class="image-comparison" id="sideBySide20">
+                        <div class="image-container">
+                            <div class="image-label original-label">📷 Original</div>
+                            <img src="images/IMG-20210913-WA0041_input.jpg" alt="Original IMG-20210913-WA0041">
+                        </div>
+                        <div class="image-container">
+                            <div class="image-label restored-label">✨ AI Restored</div>
+                            <img src="images/IMG-20210913-WA0041_restored.jpg" alt="Restored IMG-20210913-WA0041">
+                        </div>
+                    </div>
+
+                    <!-- Slider View (Hidden by default) -->
+                    <div class="slider-container" id="slider20" style="display: none;">
+                        <img class="slider-image original" src="images/IMG-20210913-WA0041_input.jpg" alt="Original IMG-20210913-WA0041">
+                        <img class="slider-image restored" src="images/IMG-20210913-WA0041_restored.jpg" alt="Restored IMG-20210913-WA0041">
+                        <div class="slider-divider"></div>
+                        <div class="slider-label original">📷 Original</div>
+                        <div class="slider-label restored">✨ Restored</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="view-toggle" onclick="toggleView(20)">Switch to Slider View</button>
+                    </div>
+                </div>
+            
+        </div>
+
+        <div class="footer">
+            <p>Generated on 21/8/2025 • Powered by FLUX Kontext AI Restoration</p>
+        </div>
+    </div>
+
+    <script>
+        let currentViews = new Array(21).fill('sideBySide');
+
+        function toggleView(index) {
+            const sideBySide = document.getElementById(`sideBySide${index}`);
+            const slider = document.getElementById(`slider${index}`);
+            const button = sideBySide.parentElement.querySelector('.view-toggle');
+
+            if (currentViews[index] === 'sideBySide') {
+                sideBySide.style.display = 'none';
+                slider.style.display = 'block';
+                button.textContent = 'Switch to Side-by-Side';
+                currentViews[index] = 'slider';
+                setupSlider(index);
+            } else {
+                sideBySide.style.display = 'flex';
+                slider.style.display = 'none';
+                button.textContent = 'Switch to Slider View';
+                currentViews[index] = 'sideBySide';
+            }
+        }
+
+        function setupSlider(index) {
+            const slider = document.getElementById(`slider${index}`);
+            const restoredImage = slider.querySelector('.restored');
+            const divider = slider.querySelector('.slider-divider');
+
+            slider.addEventListener('mousemove', (e) => {
+                const rect = slider.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const percentage = (x / rect.width) * 100;
+                
+                restoredImage.style.clipPath = `polygon(${percentage}% 0%, 100% 0%, 100% 100%, ${percentage}% 100%)`;
+                divider.style.left = `${percentage}%`;
+            });
+
+            slider.addEventListener('mouseleave', () => {
+                restoredImage.style.clipPath = 'polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%)';
+                divider.style.left = '50%';
+            });
+        }
+
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
