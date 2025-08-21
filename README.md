@@ -16,13 +16,6 @@ This is an interactive showcase of AI-powered photo restoration using FLUX Konte
 3. Click "Switch to Slider View" for interactive before/after reveals
 4. Hover over images for enhanced viewing
 
-## Deployment Options
-
-### GitHub Pages
-1. Upload all files to a GitHub repository
-2. Enable GitHub Pages in repository settings
-3. Your showcase will be live at: `https://yourusername.github.io/repository-name`
-
 ## Generated Files
 
 - `index.html` - Main showcase page
@@ -35,7 +28,3 @@ This is an interactive showcase of AI-powered photo restoration using FLUX Konte
 - JavaScript for interactive slider functionality
 - CSS animations and transitions
 - FLUX Kontext AI for photo restoration
-
----
-
-Generated on 21/8/2025 • Powered by FLUX Kontext AI
